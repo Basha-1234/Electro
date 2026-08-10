@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electro - Categories</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif;}
+body{background:#f5f5f5;}
+/* HEADER */
+header{display:flex; align-items:center; justify-content:space-between; padding:15px 5%; background:white; flex-wrap:wrap; gap:15px;}
+.logo{font-size:28px; font-weight:700; color:#ff6600;}
+.search{flex:1; display:flex; max-width:600px; border:1px solid #ddd; border-radius:30px; overflow:hidden; background:white;}
+.search input{flex:1; padding:10px; border:none; outline:none;}
+.search button{background:#ff8800; border:none; padding:10px 20px; color:white; cursor:pointer;}
+.icons{display:flex; align-items:center; gap:20px; font-size:18px;}
+.cart{position:relative; cursor:pointer;}
+.cart-count{position:absolute; top:-8px; right:-10px; background:red; color:white; border-radius:60%; font-size:12px; padding:2px 6px; display:none;}
+/* PROFILE DROPDOWN */
+.profile{position:relative; cursor:pointer;}
+.profile-dropdown{
+  display:none;
+  position:absolute;
+  right:0;
+  top:30px;
+  background:white;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  border-radius:6px;
+  min-width:140px;
+  overflow:hidden;
+  z-index:1000;
+}
+.profile-dropdown a{display:block; padding:10px; color:#333; text-decoration:none;}
+.profile-dropdown a:hover{background:#f5f5f5;}
+/* NAVBAR */
+nav{display:flex; align-items:center; justify-content:space-between; background:#ff8800; padding:10px 5%;}
+#menu{display:flex; align-items:center; gap:25px; list-style:none;}
+#menu li a{text-decoration:none; color:black; font-weight:600;}
+#menu li a:hover{color:#fff;}
+.call-btn{background:#ff6600; border:none; padding:8px 18px; color:white; border-radius:20px; cursor:pointer;}
+#showUser{color:black; font-weight:600;}
+/* CATEGORY CARDS */
+.products{padding:50px 5%; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:25px;}
+.product-card{background:#fff; border-radius:10px; padding:20px; text-align:center; transition:0.3s;}
+.product-card:hover{transform:translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+.product-card img{width:100%; height:180px; object-fit:cover;}
+.product-card button{background:#ff8c00; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer; margin-top:10px;}
+.product-card button:hover{background:#e67300;}
+/* PRODUCTS DISPLAY */
+#categoryProducts{padding:40px 5%; display:none; grid-template-columns:repeat(2,1fr); gap:25px;}
+.category-item{display:flex; gap:20px; background:#fff; padding:20px; border-radius:12px; align-items:center; box-shadow:0 5px 15px rgba(0,0,0,0.08); transition:0.3s;}
+.category-item:hover{transform:translateY(-4px);}
+.category-item img{width:120px; height:120px; object-fit:cover; border-radius:10px;}
+.product-info{flex:1;}
+.price{color:#ff6600; font-weight:600; margin:8px 0;}
+.product-buttons{display:flex; flex-direction:column; gap:12px; width:150px;}
+.product-buttons button:first-child{background:black; color:white; border:none; padding:10px; border-radius:25px; cursor:pointer; font-weight:600;}
+.product-buttons button:first-child:hover{background:#333;}
+.product-buttons button:last-child{background:#ff8c00; color:white; border:none; padding:10px; border-radius:25px; cursor:pointer; font-weight:600;}
+.product-buttons button:last-child:hover{background:#e67300;}
+/* FOOTER */
+.footer{background:#222; color:#fff; padding:30px 5%; text-align:center; margin-top:40px;}
+.help-modal{
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+.help-content{
+  background:white;
+  padding:20px;
+  max-width:400px;
+  width:80%;
+  border-radius:8px;
+  text-align:center;
+  position:relative;
+}
+.help-content .close-btn{
+  position:absolute;
+  top:10px; right:15px;
+  font-size:24px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">👜 Electro</div>
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Search products">
+    <button onclick="searchProduct()">🔍</button>
+  </div>
+  <div class="icons">
+    <div class="cart" onclick="goCart()">
+      🛒
+      <span id="cartCount" class="cart-count"></span>
+    </div>
+    <div class="profile">
+      <span onclick="toggleDropdown()">👤</span>
+      <div class="profile-dropdown" id="profileDropdown">
+        <a id="welcomeUser"></a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+ <div><span id="showUser">HI </span></div>
+  <ul id="menu">
+    <li><a href="home.html">Home</a></li>
+    <li><a href="offers.html">Offers</a></li>
+    <li><a href="pd.html">Products</a></li>
+    <li><a href="orders.html">My Orders</a></li>
+    <li><a href="#" onclick="openHelp()">Help/Contact</a></li>
+    <li><button class="call-btn">+0123 456 7890</button></li>
+  </ul>
+</nav>
+
+<!-- CATEGORY CARDS -->
+<div class="products">
+  <div class="product-card"><img src="L.jpeg" alt="Laptops"><h3>Laptops</h3><button onclick="showCategory('laptop')">View Products</button></div>
+  <div class="product-card"><img src="sp7.jpeg" alt="Smartphones"><h3>Smartphones</h3><button onclick="showCategory('mobile')">View Products</button></div>
+  <div class="product-card"><img src="SW.jpeg" alt="Smart Watch"><h3>Smart Watch</h3><button onclick="showCategory('watch')">View Products</button></div>
+  <div class="product-card"><img src="G.jpeg" alt="Gadgets"><h3>Gadgets</h3><button onclick="showCategory('gadget')">View Products</button></div>
+</div>
+
+<!-- PRODUCTS DISPLAY -->
+<div id="categoryProducts"></div>
+
+<div class="footer">© 2026 Electro Shop. All Rights Reserved.</div>
+
+<script>
+// ===== USER SESSION =====
+let storedUser = localStorage.getItem("userName");
+let isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+document.getElementById("showUser").innerText = isLoggedIn && storedUser ? storedUser : " Hii Guest";
+document.getElementById("welcomeUser").innerText = isLoggedIn && storedUser ? "Welcome, "+storedUser : "";
+
+function loadUser(){
+  let userName = localStorage.getItem("userName");
+  document.getElementById("showUser").innerText = userName ? "Hi, "+userName : "";
+  document.getElementById("welcomeUser").innerText = userName ? "Hi, "+userName : "";
+}
+
+function logout(){
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("userName");
+  window.location.href="login.html";
+}
+
+function toggleDropdown(){
+  let d=document.getElementById("profileDropdown");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+}
+window.addEventListener("click", e=>{
+  if(!e.target.closest(".profile")) document.getElementById("profileDropdown").style.display="none";
+});
+
+// ===== CART SYSTEM =====
+// cart represented as { productName: quantity }
+function getCart(){
+  let c = localStorage.getItem("cart");
+  if(!c) return {};
+  try{
+    let parsed = JSON.parse(c);
+    if(Array.isArray(parsed)){
+      // convert old array format into object map
+      let obj = {};
+      parsed.forEach(n => { obj[n] = (obj[n]||0) + 1; });
+      localStorage.setItem("cart", JSON.stringify(obj));
+      return obj;
+    }
+    if(typeof parsed === 'object' && parsed !== null) return parsed;
+  }catch(e){ }
+  return {};
+}
+
+const USD_TO_INR = 82; // rate used for display
+
+function updateCart(){
+  let cart = getCart();
+  let total = Object.values(cart).reduce((s,v)=>s + (typeof v==='number'?v:0),0);
+  let badge = document.getElementById("cartCount");
+  if(total>0){ badge.innerText=total; badge.style.display="inline-block"; }
+  else badge.style.display="none";
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+function addToCart(productName){
+  let cart=getCart();
+  cart[productName] = (cart[productName]||0)+1;
+  localStorage.setItem("cart",JSON.stringify(cart));
+  updateCart();
+}
+function goCart(){ window.location="cart.html";}
+function goBuy(name, category){
+  window.location = `buy.html?name=${encodeURIComponent(name)}&category=${encodeURIComponent(category)}`;
+}
+updateCart();
+
+// ===== PRODUCTS DATA =====
+let products = [
+  // Laptops - 5 products per brand
+  {name:"MacBook Pro 14", price:1999, img:"l1.jpeg", category:"laptop", brand:"Apple"},
+  {name:"MacBook Air", price:1499, img:"l2.jpeg", category:"laptop", brand:"Apple"},
+  {name:"Dell XPS 15", price:1899, img:"l3.jpeg", category:"laptop", brand:"Dell"},
+  {name:"Dell Inspiron 16", price:1299, img:"l4.jpeg", category:"laptop", brand:"Dell"},
+  {name:"HP Spectre x360", price:1599, img:"l5.jpeg", category:"laptop", brand:"HP"},
+  {name:"HP Envy 15", price:1399, img:"l6.jpeg", category:"laptop", brand:"HP"},
+  {name:"Lenovo ThinkPad X1", price:1799, img:"l7.jpeg", category:"laptop", brand:"Lenovo"},
+  {name:"Lenovo IdeaPad 5", price:1099, img:"l8.jpeg", category:"laptop", brand:"Lenovo"},
+  {name:"ASUS ROG Zephyrus", price:2199, img:"l9.jpeg", category:"laptop", brand:"ASUS"},
+  {name:"ASUS ZenBook 14", price:1899, img:"l10.jpeg", category:"laptop", brand:"ASUS"},
+
+  // Smartphones - 5 products per brand
+  {name:"iPhone 15 Pro", price:999, img:"p1.jpeg", category:"mobile", brand:"Apple"},
+  {name:"iPhone 15", price:899, img:"p2.jpeg", category:"mobile", brand:"Apple"},
+  {name:"Samsung Galaxy S24", price:899, img:"p3.jpeg", category:"mobile", brand:"Samsung"},
+  {name:"Samsung Galaxy S24+", price:999, img:"p4.jpeg", category:"mobile", brand:"Samsung"},
+  {name:"Google Pixel 8", price:799, img:"p5.jpeg", category:"mobile", brand:"Google"},
+  {name:"Google Pixel 8 Pro", price:899, img:"p6.jpeg", category:"mobile", brand:"Google"},
+  {name:"OnePlus 12", price:749, img:"p7.jpeg", category:"mobile", brand:"OnePlus"},
+  {name:"OnePlus 12 Pro", price:849, img:"p8.jpeg", category:"mobile", brand:"OnePlus"},
+  {name:"Xiaomi 14", price:699, img:"p9.jpeg", category:"mobile", brand:"Xiaomi"},
+  {name:"Xiaomi 14 Pro", price:799, img:"p10.jpeg", category:"mobile", brand:"Xiaomi"},
+
+  // Smart Watches - 5 products per brand
+  {name:"Apple Watch Series 9", price:399, img:"sw1.jpeg", category:"watch", brand:"Apple"},
+  {name:"Apple Watch SE", price:249, img:"sw2.jpeg", category:"watch", brand:"Apple"},
+  {name:"Samsung Galaxy Watch 6", price:349, img:"sw3.jpeg", category:"watch", brand:"Samsung"},
+  {name:"Samsung Galaxy Watch 5", price:299, img:"sw4.jpeg", category:"watch", brand:"Samsung"},
+  {name:"Fitbit Versa 4", price:229, img:"sw5.jpeg", category:"watch", brand:"Fitbit"},
+  {name:"Fitbit Sense 2", price:299, img:"sw6.jpeg", category:"watch", brand:"Fitbit"},
+  {name:"Garmin Venu 2", price:349, img:"sw7.jpeg", category:"watch", brand:"Garmin"},
+  {name:"Garmin Fenix 7", price:499, img:"sw8.jpeg", category:"watch", brand:"Garmin"},
+  {name:"Google Pixel Watch 2", price:299, img:"sw9.jpeg", category:"watch", brand:"Google"},
+  {name:"Google Pixel Watch 1", price:249, img:"sw10.jpeg", category:"watch", brand:"Google"},
+
+  // Gadgets - 5 products per brand (earbuds, keyboard, mouse, etc.)
+  {name:"AirPods Pro 2", price:249, img:"g1.jpeg", category:"gadget", brand:"Apple"},
+  {name:"Magic Keyboard", price:99, img:"g2.jpeg", category:"gadget", brand:"Apple"},
+  {name:"Apple Pencil 2", price:129, img:"g3.jpeg", category:"gadget", brand:"Apple"},
+  {name:"Logitech MX Master 3 Mouse", price:99, img:"g4.jpeg", category:"gadget", brand:"Logitech"},
+  {name:"Logitech K380 Keyboard", price:49, img:"g5.jpeg", category:"gadget", brand:"Logitech"},
+  {name:"Sony WF-1000XM5", price:299, img:"g6.jpeg", category:"gadget", brand:"Sony"},
+  {name:"Sony SRS-XB43 Speaker", price:199, img:"g7.jpeg", category:"gadget", brand:"Sony"},
+  {name:"Samsung Galaxy Buds2 Pro", price:229, img:"G62.jpeg", category:"gadget", brand:"Samsung"},
+  {name:"Samsung SmartTag+", price:29, img:"g9.jpeg", category:"gadget", brand:"Samsung"},
+  {name:"Samsung Wireless Charger Duo", price:59, img:"g10.jpeg", category:"gadget", brand:"Samsung"}
+];
+
+// ===== DISPLAY PRODUCTS =====
+let currentSearch = "";
+function displayProducts(items){
+  let container=document.getElementById("categoryProducts");
+  container.innerHTML="";
+  container.style.display="grid";
+  container.style.gridTemplateColumns="repeat(2,1fr)";
+  container.style.gap="25px";
+  items.forEach(p=>{
+    container.innerHTML+=`
+    <div class="category-item">
+      <img src="${p.img}" alt="${p.name}">
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <div class="price">₹${(p.price * USD_TO_INR).toFixed(2)}</div>
+      </div>
+      <div class="product-buttons">
+        <button onclick="goBuy('${p.name}','${p.category}')">Buy Now</button>
+        <button onclick="addToCart('${p.name}')">Add To Cart</button>
+      </div>
+    </div>`;
+  });
+}
+
+// ===== CATEGORY FILTER AFTER SEARCH =====
+function showCategory(category){
+  let filtered=products.filter(p=>p.category===category);
+  if(currentSearch){
+    filtered=filtered.filter(p=>p.name.toLowerCase().includes(currentSearch));
+  }
+  displayProducts(filtered);
+}
+
+// ===== SEARCH FUNCTION =====
+function searchProduct(){
+  let keyword=document.getElementById("searchInput").value.toLowerCase();
+  currentSearch=keyword;
+  let filtered=products.filter(p=>{
+    let name=p.name.toLowerCase();
+    // plural support
+    if(keyword.endsWith("s")) keyword=keyword.slice(0,-1);
+    return name.includes(keyword);
+  });
+  displayProducts(filtered);
+}
+
+// Trigger search on Enter
+document.getElementById("searchInput").addEventListener("keydown", function(e){
+  if(e.key==="Enter") searchProduct();
+});
+
+// HELP modal handlers
+function openHelp(){document.getElementById('helpModal').style.display='flex';}
+function closeHelp(){document.getElementById('helpModal').style.display='none';}
+document.addEventListener('click',e=>{if(e.target.id==='helpModal')closeHelp();});
+
+</script>
+
+<!-- HELP/CONTACT MODAL -->
+<div class="help-modal" id="helpModal">
+  <div class="help-content">
+    <span class="close-btn" onclick="closeHelp()">&times;</span>
+    <h2>Help & Contact</h2>
+    <p>Call us: 1800-123-4567</p>
+    <p>Email: support@electro.com</p>
+    <p>Chat with us 24×7</p>
+    <p>FAQ: <a href="faq.html">Visit FAQ</a></p>
+  </div>
+</div>
+
+</body>
+</html>

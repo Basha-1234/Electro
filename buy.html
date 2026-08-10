@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electro - Buy Product</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#f5f5f5;}
+header{display:flex;align-items:center;justify-content:space-between;padding:15px 5%;background:white;flex-wrap:wrap;gap:15px;}
+.logo{font-size:28px;font-weight:700;color:#ff6600;}
+.search{flex:1;display:flex;max-width:600px;border:1px solid #ddd;border-radius:30px;overflow:hidden;background:white;}
+.search input{flex:1;padding:10px;border:none;outline:none;}
+.search button{background:#ff8800;border:none;padding:10px 20px;color:white;cursor:pointer;}
+.icons{display:flex;align-items:center;gap:20px;font-size:18px;}
+.cart{position:relative;cursor:pointer;}
+.cart-count{position:absolute;top:-8px;right:-10px;background:red;color:white;border-radius:50%;font-size:12px;padding:2px 6px;display:none;}
+/* PROFILE DROPDOWN */
+.profile{position:relative; cursor:pointer;}
+.profile-dropdown{
+  display:none;
+  position:absolute;
+  right:0;
+  top:30px;
+  background:white;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  border-radius:6px;
+  min-width:140px;
+  overflow:hidden;
+  z-index:1000;
+}
+.profile-dropdown a{display:block; padding:10px; color:#333; text-decoration:none;}
+.profile-dropdown a:hover{background:#f5f5f5;}
+nav{display:flex;align-items:center;justify-content:space-between;background:#ff8800;padding:10px 5%;}
+#menu{display:flex;align-items:center;gap:25px;list-style:none;}
+#menu li a{text-decoration:none;color:black;font-weight:600;}
+#menu li a:hover{color:#ffffff;}
+.call-btn{background:#ff6600;border:none;padding:8px 18px;color:white;border-radius:20px;cursor:pointer;}
+#showUser{color:black;font-weight:600;}
+/* detail layout */
+#productDetail{max-width:900px;margin:40px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1);display:flex;gap:30px;flex-wrap:wrap;}
+#productDetail img{width:300px;height:300px;object-fit:cover;border-radius:10px;}
+#productInfo{flex:1;}
+#productInfo h2{margin-bottom:10px;}
+#productInfo .price{color:#ff6600;font-size:24px;font-weight:600;margin:15px 0;}
+#productInfo .specs{margin:15px 0;}
+#productInfo .specs ul{list-style:disc inside;}
+#productInfo .buttons{display:flex;gap:15px;margin-top:20px;}
+#productInfo .buttons button{padding:10px 20px;border:none;border-radius:5px;cursor:pointer;font-weight:600;}
+#productInfo .buttons .buy-btn{background:black;color:white;}
+#productInfo .buttons .cart-btn{background:#ff8800;color:white;}
+/* related products horizontal scroll */
+#relatedProducts{max-width:1000px;margin:20px auto;padding:0 20px;display:flex;overflow-x:auto;gap:20px;}
+.related-card{min-width:200px;background:#fff;border-radius:10px;padding:15px;box-shadow:0 3px 10px rgba(0,0,0,0.1);flex-shrink:0;display:flex;flex-direction:column;align-items:center;}
+.related-card img{width:150px;height:150px;object-fit:cover;border-radius:10px;}
+.related-card h4{margin:10px 0 5px; text-align:center;}
+.related-card .price{color:#ff6600;font-weight:600;}
+.related-card button{margin-top:auto;padding:8px 12px;background:#000;color:#fff;border:none;border-radius:5px;cursor:pointer;}
+.help-modal{
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+.help-content{
+  background:white;
+  padding:20px;
+  max-width:400px;
+  width:80%;
+  border-radius:8px;
+  text-align:center;
+  position:relative;
+}
+.help-content .close-btn{
+  position:absolute;
+  top:10px; right:15px;
+  font-size:24px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">👜 Electro</div>
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Search products">
+    <button onclick="searchProduct()">🔍</button>
+  </div>
+  <div class="icons">
+    <div class="cart" onclick="goCart()">
+      🛒
+      <span id="cartCount" class="cart-count"></span>
+    </div>
+    <div class="profile">
+      <span onclick="toggleDropdown()">👤</span>
+      <div class="profile-dropdown" id="profileDropdown">
+        <a id="welcomeUser"></a>
+        <a href="profile.html">My Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div id="showUser"></div>
+  <ul id="menu">
+    <li><a href="home.html">Home</a></li>
+    <li><a href="offers.html">Offers</a></li>
+    <li><a href="pd.html">Products</a></li>
+    <li><a href="orders.html">My Orders</a></li>
+    <li><a href="#" onclick="openHelp()">Help/Contact</a></li>
+    <li><button class="call-btn">+0123 456 7890</button></li>
+  </ul>
+</nav>
+
+<main>
+  <div id="productDetail"></div>
+  <h3 style="margin:20px auto 0; max-width:1000px;padding-left:20px;">More from this category</h3>
+  <div id="relatedProducts"></div>
+</main>
+
+<script>
+// ===== shared product database =====
+const USD_TO_INR = 82; // conversion rate
+const products = [
+  {name:"MacBook Pro 14", price:1999, img:"l1.jpeg", category:"laptop", brand:"Apple", details:"M2 chip, 14-inch Retina"},
+  {name:"MacBook Air", price:1499, img:"l2.jpeg", category:"laptop", brand:"Apple", details:"M2 chip, 13-inch"},
+  {name:"Dell XPS 15", price:1899, img:"l3.jpeg", category:"laptop", brand:"Dell", details:"Intel i7, 15-inch"},
+  {name:"Dell Inspiron 16", price:1299, img:"l4.jpeg", category:"laptop", brand:"Dell", details:"Intel i5, 16-inch"},
+  {name:"HP Spectre x360", price:1599, img:"l5.jpeg", category:"laptop", brand:"HP", details:"Convertible touch"},
+  {name:"HP Envy 15", price:1399, img:"l6.jpeg", category:"laptop", brand:"HP", details:"Dedicated GPU"},
+  {name:"Lenovo ThinkPad X1", price:1799, img:"l7.jpeg", category:"laptop", brand:"Lenovo", details:"Business class"},
+  {name:"Lenovo IdeaPad 5", price:1099, img:"l8.jpeg", category:"laptop", brand:"Lenovo", details:"Budget friendly"},
+  {name:"ASUS ROG Zephyrus", price:2199, img:"l9.jpeg", category:"laptop", brand:"ASUS", details:"Gaming powerhouse"},
+  {name:"ASUS ZenBook 14", price:1899, img:"l10.jpeg", category:"laptop", brand:"ASUS", details:"Slim design"},
+
+  {name:"iPhone 15 Pro", price:999, img:"p1.jpeg", category:"mobile", brand:"Apple", details:"A17 chip, Pro cameras"},
+  {name:"iPhone 15", price:899, img:"p2.jpeg", category:"mobile", brand:"Apple", details:"A16 chip"},
+  {name:"Samsung Galaxy S24", price:899, img:"p3.jpeg", category:"mobile", brand:"Samsung", details:"Snapdragon 8 Gen 3"},
+  {name:"Samsung Galaxy S24+", price:999, img:"p4.jpeg", category:"mobile", brand:"Samsung", details:"6.7-inch display"},
+  {name:"Google Pixel 8", price:799, img:"p5.jpeg", category:"mobile", brand:"Google", details:"Tensor G3"},
+  {name:"Google Pixel 8 Pro", price:899, img:"p6.jpeg", category:"mobile", brand:"Google", details:"Pro grade camera"},
+  {name:"OnePlus 12", price:749, img:"p7.jpeg", category:"mobile", brand:"OnePlus", details:"Fast charging"},
+  {name:"OnePlus 12 Pro", price:849, img:"p8.jpeg", category:"mobile", brand:"OnePlus", details:"120Hz AMOLED"},
+  {name:"Xiaomi 14", price:699, img:"p9.jpeg", category:"mobile", brand:"Xiaomi", details:"Android 14"},
+  {name:"Xiaomi 14 Pro", price:799, img:"p10.jpeg", category:"mobile", brand:"Xiaomi", details:"120W charging"},
+
+  {name:"Apple Watch Series 9", price:399, img:"sw1.jpeg", category:"watch", brand:"Apple", details:"Always on display"},
+  {name:"Apple Watch SE", price:249, img:"sw2.jpeg", category:"watch", brand:"Apple", details:"Affordable"},
+  {name:"Samsung Galaxy Watch 6", price:349, img:"sw3.jpeg", category:"watch", brand:"Samsung", details:"BioActive sensor"},
+  {name:"Samsung Galaxy Watch 5", price:299, img:"sw4.jpeg", category:"watch", brand:"Samsung", details:"Durable"},
+  {name:"Fitbit Versa 4", price:229, img:"sw5.jpeg", category:"watch", brand:"Fitbit", details:"Fitness focussed"},
+  {name:"Fitbit Sense 2", price:299, img:"sw6.jpeg", category:"watch", brand:"Fitbit", details:"Health features"},
+  {name:"Garmin Venu 2", price:349, img:"sw7.jpeg", category:"watch", brand:"Garmin", details:"GPS tracking"},
+  {name:"Garmin Fenix 7", price:499, img:"sw8.jpeg", category:"watch", brand:"Garmin", details:"Rugged"},
+  {name:"Google Pixel Watch 2", price:299, img:"sw9.jpeg", category:"watch", brand:"Google", details:"Sleek"},
+  {name:"Google Pixel Watch 1", price:249, img:"sw10.jpeg", category:"watch", brand:"Google", details:"Affordable"},
+
+  {name:"AirPods Pro 2", price:249, img:"g1.jpeg", category:"gadget", brand:"Apple", details:"Noise cancellation"},
+  {name:"Magic Keyboard", price:99, img:"g2.jpeg", category:"gadget", brand:"Apple", details:"Wireless"},
+  {name:"Apple Pencil 2", price:129, img:"g3.jpeg", category:"gadget", brand:"Apple", details:"Stylus"},
+  {name:"Logitech MX Master 3 Mouse", price:99, img:"g4.jpeg", category:"gadget", brand:"Logitech", details:"Ergonomic"},
+  {name:"Logitech K380 Keyboard", price:49, img:"g5.jpeg", category:"gadget", brand:"Logitech", details:"Compact"},
+  {name:"Sony WF-1000XM5", price:299, img:"g6.jpeg", category:"gadget", brand:"Sony", details:"Hi-res audio"},
+  {name:"Sony SRS-XB43 Speaker", price:199, img:"g7.jpeg", category:"gadget", brand:"Sony", details:"Extra bass"},
+  {name:"Samsung Galaxy Buds2 Pro", price:229, img:"G62.jpeg", category:"gadget", brand:"Samsung", details:"3D audio"},
+  {name:"Samsung SmartTag+", price:29, img:"g9.jpeg", category:"gadget", brand:"Samsung", details:"Tracking"},
+  {name:"Samsung Wireless Charger Duo", price:59, img:"g10.jpeg", category:"gadget", brand:"Samsung", details:"Fast charge"}
+];
+
+// ===== URL PARAMS =====
+function getParam(n){ const params=new URLSearchParams(window.location.search); return params.get(n); }
+
+// ===== CART & ORDERS (same as other pages) =====
+function getCart(){ let c=localStorage.getItem("cart"); if(!c) return {}; try{return JSON.parse(c);}catch(e){return {};}}
+function updateCart(){ let cart=getCart(); let total=0; for(let k in cart){ total += typeof cart[k]==='number'?cart[k]:cart[k].qty||0; } let badge=document.getElementById("cartCount"); if(total>0){badge.innerText=total; badge.style.display="inline-block";} else badge.style.display="none"; localStorage.setItem("cart",JSON.stringify(cart)); }
+function addToCart(name){ let cart=getCart(); cart[name]=(cart[name]||0)+1; localStorage.setItem("cart",JSON.stringify(cart)); updateCart(); }
+function placeOrder(name){
+  // ask for user's current location before completing order
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const coords = position.coords;
+        const locationStr = coords.latitude.toFixed(6) + "," + coords.longitude.toFixed(6);
+        saveOrder(name, locationStr);
+      },
+      error => {
+        console.warn('Could not obtain location', error);
+        // proceed without location
+        saveOrder(name, null);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser');
+    saveOrder(name, null);
+  }
+}
+
+function saveOrder(name, location) {
+  let cart = getCart();
+  let qty = cart[name] || 1;
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  let p = products.find(x => x.name === name);
+  orders.push({
+    name: p.name,
+    price: (p.price * USD_TO_INR).toFixed(2),
+    img: p.img,
+    quantity: qty,
+    status: "Pending",
+    location: location || 'unknown'
+  });
+  localStorage.setItem("orders", JSON.stringify(orders));
+  if (cart[name]) {
+    delete cart[name];
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+  updateCart();
+  let msg = "✅ Order placed successfully";
+  if(location) msg += "\nLocation: " + location;
+  alert(msg);
+}
+function goCart(){ window.location="cart.html"; }
+function goBuy(name, category){
+  window.location = `buy.html?name=${encodeURIComponent(name)}&category=${encodeURIComponent(category)}`;
+}
+
+// ===== SEARCH/USER/SESSION =====
+let storedUser=localStorage.getItem("userName"); let isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+document.getElementById("showUser").innerText = isLoggedIn && storedUser ? "Hi, "+storedUser : "Guest";
+document.getElementById("welcomeUser").innerText = isLoggedIn && storedUser ? "Welcome, "+storedUser : "";
+
+function logout(){
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("userName");
+  window.location.href="login.html";
+}
+
+function toggleDropdown(){
+  let d=document.getElementById("profileDropdown");
+  d.style.display = d.style.display==="block" ? "none" : "block";
+}
+window.addEventListener("click", e=>{
+  if(!e.target.closest(".profile")) document.getElementById("profileDropdown").style.display="none";
+});
+
+function searchProduct(){ let kw=document.getElementById("searchInput").value.toLowerCase(); if(kw){ window.location.href="pd.html?search="+encodeURIComponent(kw);} }
+
+document.getElementById("searchInput").addEventListener("keydown", function(e){
+  if(e.key==="Enter") searchProduct();
+});
+
+// ===== RENDER =====
+
+function renderDetail(name){
+  let p=products.find(x=>x.name===name);
+  if(!p){ document.getElementById("productDetail").innerHTML="<p>Product not found.</p>"; return; }
+  const specList = `
+    <ul>
+      <li>${p.brand || 'Brand'} specification 1</li>
+      <li>Specification 2</li>
+      <li>Specification 3</li>
+    </ul>`;
+  const inrPrice = (p.price * USD_TO_INR).toFixed(2);
+  document.getElementById("productDetail").innerHTML = `
+    <img src="${p.img}" alt="${p.name}">
+    <div id="productInfo">
+      <h2>${p.name}</h2>
+      <div class="price">₹${inrPrice}</div>
+      <div class="specs"><strong>Details:</strong> ${p.details||'N/A'}${specList}</div>
+      <div class="buttons">
+        <button class="buy-btn" onclick="placeOrder('${p.name}')">Place Order</button>
+        <button class="cart-btn" onclick="addToCart('${p.name}')">Add to Cart</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderRelated(category,current){
+  let container=document.getElementById("relatedProducts");
+  container.innerHTML="";
+  let list = products.filter(p=>p.category===category && p.name!==current);
+  list.forEach(p=>{
+    const inr = (p.price * USD_TO_INR).toFixed(2);
+    container.innerHTML += `
+      <div class="related-card">
+        <img src="${p.img}" alt="${p.name}">
+        <h4>${p.name}</h4>
+        <div class="price">₹${inr}</div>
+        <button onclick="goBuy('${p.name}','${p.category}')">Buy</button>
+      </div>
+    `;
+  });
+}
+
+// HELP modal handlers
+function openHelp(){document.getElementById('helpModal').style.display='flex';}
+function closeHelp(){document.getElementById('helpModal').style.display='none';}
+document.addEventListener('click',e=>{if(e.target.id==='helpModal')closeHelp();});
+
+function init(){
+  updateCart();
+  let name=getParam('name');
+  let cat=getParam('category');
+  if(!name){ document.getElementById("productDetail").innerHTML="<p>No product selected.</p>"; return; }
+  renderDetail(name);
+  if(!cat){ let p=products.find(x=>x.name===name); cat = p ? p.category : '';
+  }
+  if(cat){ renderRelated(cat,name); }
+}
+
+init();
+
+</script>
+<!-- HELP/CONTACT MODAL -->
+<div class="help-modal" id="helpModal">
+  <div class="help-content">
+    <span class="close-btn" onclick="closeHelp()">&times;</span>
+    <h2>Help & Contact</h2>
+    <p>Call us: 1800-123-4567</p>
+    <p>Email: support@electro.com</p>
+    <p>Chat with us 24×7</p>
+    <p>FAQ: <a href="faq.html">Visit FAQ</a></p>
+  </div>
+</div>
+
+</body>
+</html>

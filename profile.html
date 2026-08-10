@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electro - My Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#f5f5f5;}
+header{display:flex;align-items:center;justify-content:space-between;padding:15px 5%;background:white;flex-wrap:wrap;gap:15px;}
+.logo{font-size:28px;font-weight:700;color:#ff6600;}
+.search{flex:1;display:flex;max-width:600px;border:1px solid #ddd;border-radius:30px;overflow:hidden;background:white;}
+.search input{flex:1;padding:10px;border:none;outline:none;}
+.search button{background:#ff8800;border:none;padding:10px 20px;color:white;cursor:pointer;}
+.icons{display:flex;align-items:center;gap:20px;font-size:18px;}
+.cart{position:relative;cursor:pointer;}
+.cart-count{position:absolute;top:-8px;right:-10px;background:red;color:white;border-radius:50%;font-size:12px;padding:2px 6px;display:none;}
+/* profile dropdown */
+.profile{position:relative; cursor:pointer;}
+.profile-dropdown{display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:6px;min-width:140px;overflow:hidden;z-index:1000;}
+.profile-dropdown a{display:block;padding:10px;color:#333;text-decoration:none;}
+.profile-dropdown a:hover{background:#f5f5f5;}
+/* profile page */
+.profile-container{max-width:600px;margin:40px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1);}
+.profile-header{text-align:center;margin-bottom:20px;}
+.avatar{font-size:50px;margin-bottom:10px;}
+.profile-header h2{margin-bottom:5px;}
+.profile-header p{color:#555;}
+.profile-details .input-box{margin-bottom:15px;}
+.profile-details .input-box input{width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;}
+.profile-details button{padding:10px 20px;background:#ff6600;color:#fff;border:none;border-radius:5px;cursor:pointer;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">👜 Electro</div>
+  <div class="icons">
+    <div class="cart" onclick="goCart()">
+      🛒
+      <span id="cartCount" class="cart-count"></span>
+    </div>
+    <div class="profile">
+      <span onclick="toggleDropdown()">👤</span>
+      <div class="profile-dropdown" id="profileDropdown">
+        <a href="profile.html">My Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+<nav>
+  <div id="showUser"></div>
+  <ul id="menu">
+    <li><a href="home.html">Home</a></li>
+    <li><a href="offers.html">Offers</a></li>
+    <li><a href="pd.html">Products</a></li>
+    <li><a href="orders.html">My Orders</a></li>
+    <li><button class="call-btn">+0123 456 7890</button></li>
+  </ul>
+</nav>
+<main>
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="avatar">👤</div>
+      <h2 id="profUsernameHeading"></h2>
+      <p id="profEmailPara"></p>
+    </div>
+    <div class="profile-details">
+      <div class="input-box">
+        <label>Location</label>
+        <input type="text" id="profLocation" placeholder="Enter location">
+      </div>
+      <button onclick="saveLocation()">Save Location</button>
+      <div style="margin-top:20px;">
+        <a href="login.html?reset=true">Change Password</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// shared helpers
+function getCart(){let c=localStorage.getItem("cart");if(!c) return {};try{let p=JSON.parse(c);if(Array.isArray(p)){let o={};p.forEach(n=>{o[n]=(o[n]||0)+1});localStorage.setItem("cart",JSON.stringify(o));return o;}if(typeof p==='object'&&p!==null) return p;}catch(e){}return{};}
+function updateCart(){let cart=getCart();let total=Object.values(cart).reduce((s,v)=>s+(typeof v==='number'?v:0),0);let b=document.getElementById("cartCount");if(b){if(total>0){b.innerText=total;b.style.display="inline-block";}else b.style.display="none";}localStorage.setItem("cart",JSON.stringify(cart));}
+function goCart(){window.location="cart.html";}
+function searchProduct(){let kw=document.getElementById("searchInput").value.toLowerCase();if(kw){window.location.href="pd.html?search="+encodeURIComponent(kw);} }
+
+// session/user
+let storedUser=localStorage.getItem("userName"); let isLoggedIn=localStorage.getItem("isLoggedIn")==="true";
+document.getElementById("showUser").innerText=isLoggedIn&&storedUser?"Hi, "+storedUser:"Guest";
+updateCart();
+
+function logout(){localStorage.removeItem("isLoggedIn");localStorage.removeItem("userName");localStorage.removeItem("userEmail");localStorage.removeItem("userLocation");window.location.href="login.html";}
+function toggleDropdown(){let d=document.getElementById("profileDropdown");d.style.display=d.style.display==="block"?"none":"block";}
+window.addEventListener("click",e=>{if(!e.target.closest(".profile"))document.getElementById("profileDropdown").style.display="none";});
+
+// profile logic
+function initProfile(){
+  let email = localStorage.getItem("userEmail");
+  if(!email){alert('Not logged in');window.location.href='login.html';return;}
+  const users=JSON.parse(localStorage.getItem('users'))||[];
+  const user = users.find(u=>u.email===email);
+  if(!user){alert('User not found');return;}
+  document.getElementById('profUsername').innerText=user.username;
+  document.getElementById('profEmail').innerText=user.email;
+  // also fill header elements
+  document.getElementById('profUsernameHeading').innerText = user.username;
+  document.getElementById('profEmailPara').innerText = user.email;
+  document.getElementById('profLocation').value = user.location || localStorage.getItem('userLocation')||'';
+}
+
+function saveLocation(){
+  let loc=document.getElementById('profLocation').value.trim();
+  let email=localStorage.getItem('userEmail');
+  let users=JSON.parse(localStorage.getItem('users'))||[];
+  let u=users.find(u=>u.email===email);
+  if(u){u.location=loc;localStorage.setItem('users',JSON.stringify(users));}
+  localStorage.setItem('userLocation',loc);
+  alert('Location updated');
+}
+
+initProfile();
+</script>
+</body>
+</html>
